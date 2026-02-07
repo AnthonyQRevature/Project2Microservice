@@ -1,0 +1,2 @@
+it is possible to put components in the util classes but ill choose not to put any components in here
+util classes that are beans must be explicitly defined in the configuration definition

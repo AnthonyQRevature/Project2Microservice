@@ -1,0 +1,71 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Eureka Server",
+			"type": "shell",
+			"command": "C:/Program Files/Git/bin/bash.exe",
+			"args": [
+				"./mvnw", "spring-boot:run"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}/eureka-demo",
+				"env": {
+
+				}
+			},
+			
+			"problemMatcher": []
+		},
+		{
+			"label": "Api Gateway",
+			"type": "shell",
+			"command": "C:/Program Files/Git/bin/bash.exe",
+			"args": [
+				"./mvnw", "spring-boot:run"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}/api-gateway-demo"
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "Auth Server",
+			"type": "shell",
+			"command": "C:/Program Files/Git/bin/bash.exe",
+			"args": [
+				"./mvnw", "spring-boot:run"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}/api-gateway-demo"
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "Start Eureka2",
+			"type": "shell",
+			"command": "Start-Process",
+			"args": [
+				"-FilePath",
+				"C:/WINDOWS/System32/cmd.exe",
+				"-ArgumentList",
+				"/K \"./mvnw spring-boot:run\""
+			],
+			"options": {
+				"cwd": ""
+			}
+		},
+		{
+			"label": "Install Util",
+			"type": "process",
+			"command": "mvn",
+			"args": [
+				"install"
+			],
+			"problemMatcher": [],
+			"options": {
+				"cwd": "${workspaceFolder}/util"
+			}
+		}
+	]
+}

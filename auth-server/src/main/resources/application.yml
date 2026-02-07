@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: auth-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: secret
+    driver-class-name: org.postgresql.Driver
+
+server:
+  port: 8083
+
+eureka:
+  #  instance:
+  #    hostname: localhost
+  client:
+    enabled: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+    instance:
+      prefer-ip-address: true
+
+# Secret key used as an encryption key in TokenUtil
+security.secret: HVmw2nb7Zgbo0BLtoY3Iv7Sh2CnEgfUd
