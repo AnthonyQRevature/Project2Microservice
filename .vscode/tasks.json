@@ -37,7 +37,19 @@
 				"./mvnw", "spring-boot:run"
 			],
 			"options": {
-				"cwd": "${workspaceFolder}/api-gateway-demo"
+				"cwd": "${workspaceFolder}/auth-server"
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "User Server",
+			"type": "shell",
+			"command": "C:/Program Files/Git/bin/bash.exe",
+			"args": [
+				"./mvnw", "spring-boot:run"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}/user-server"
 			},
 			"problemMatcher": []
 		},

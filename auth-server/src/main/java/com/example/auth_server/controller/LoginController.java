@@ -6,11 +6,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.AllowCors;
+import com.example.UserRole;
 import com.example.auth_server.service.AuthService;
-import com.example.exception.*;
+import com.example.exception.AuthenticationException;
+import com.example.exception.DatabaseConflictException;
+import com.example.exception.InvalidCredentialsException;
 import com.example.model.AuthResponse;
 import com.example.model.LoginRequest;
 import com.example.model.LoginResponse;
@@ -65,10 +69,19 @@ public class LoginController {
         }
     }
 
+    /*
     @GetMapping("/")
     public AuthResponse verifyToken(@RequestHeader("Authorization") String auth)
     {
         return service.validateToken(auth);
+    }*/
+
+    @GetMapping("/")
+    public AuthResponse verifyToken(
+        @RequestHeader("Authorization") String auth,
+        @RequestParam(required=true) Integer userRoleLevel
+    ) {
+        return service.validateToken(auth, UserRole.of(userRoleLevel));
     }
 
     @Autowired

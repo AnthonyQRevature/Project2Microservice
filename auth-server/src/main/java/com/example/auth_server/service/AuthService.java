@@ -1,17 +1,20 @@
 package com.example.auth_server.service;
 
-import com.example.HasherUtil;
-import com.example.TokenUtil;
-import com.example.UserRole;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.DefaultPfp;
+import com.example.HasherUtil;
+import com.example.TokenUtil;
+import com.example.UserRole;
 import com.example.auth_server.repository.AuthDao;
 import com.example.entity.UserEntity;
 import com.example.entity.UserProfileEntity;
-import com.example.exception.*;
+import com.example.exception.AuthenticationException;
+import com.example.exception.DatabaseConflictException;
+import com.example.exception.InvalidCredentialsException;
 import com.example.model.AuthResponse;
 import com.example.model.LoginRequest;
 import com.example.model.LoginResponse;
@@ -88,11 +91,26 @@ public class AuthService {
         }
     }
 
+    /*
     public AuthResponse validateToken(String token){
         if(jwtUtil.validateToken(token)){
             return new AuthResponse(token, true);
         }else{
             return new AuthResponse(token, false);
         }
+    }*/
+
+    public AuthResponse validateToken(String auth, UserRole requiredRole)
+    {
+        var token = jwtUtil.asToken(auth);
+        if (!token.isValid() || token.isExpired())
+            return new AuthResponse(auth, false);
+        Optional<UserEntity> user = authDao.findById(token.getId());
+        if (user.isEmpty())
+            return new AuthResponse(auth, false);
+        UserRole role = user.get().getRole();
+        if (role.value < requiredRole.value)
+            return new AuthResponse(auth, false);
+        return new AuthResponse(auth, true);
     }
 }

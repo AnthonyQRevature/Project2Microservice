@@ -12,6 +12,12 @@ spring:
                 - Path=/api/auth/**
               filters:
                 - StripPrefix=2
+            - id: user-route
+              uri: lb://user-service
+              predicates:
+                - Path=/api/users/**
+              filters:
+                - StripPrefix=1
 
 server:
   port: 8080
