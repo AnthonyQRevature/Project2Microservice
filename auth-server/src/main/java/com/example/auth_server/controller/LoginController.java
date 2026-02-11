@@ -81,9 +81,17 @@ public class LoginController {
     @GetMapping("")
     public AuthResponse verifyToken(
         @RequestHeader("Authorization") String auth,
+        @RequestParam(required=false) Integer userId,
         @RequestParam(required=true) Integer userRoleLevel
     ) {
-        return service.validateToken(auth, UserRole.of(userRoleLevel));
+        if (userId == null)
+        {
+            return service.validateToken(auth, UserRole.of(userRoleLevel));
+        }
+        else
+        {
+            return service.validateToken(auth, userId, UserRole.of(userRoleLevel));
+        }
     }
 
     @Autowired

@@ -2,6 +2,7 @@ package com.example.controller;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+
 import javax.security.auth.login.AccountNotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.AllowCors;
+import com.example.SecurityHelper;
 import com.example.UserRole;
+import com.example.exception.ServiceUnavailableException;
 import com.example.model.UserResponse;
 import com.example.model.UserUpdateRequest;
 import com.example.service.UserService;
@@ -27,6 +30,7 @@ import com.example.service.UserService;
 @RequestMapping("/users")
 public class UserController {
     
+    SecurityHelper security;
     UserService userService;
 
     @GetMapping("/by-username/{username}")
@@ -55,25 +59,44 @@ public class UserController {
         @PathVariable("id") Integer id, 
         @RequestBody UserUpdateRequest body
     ) {
-        //TODO auth
-
         try{
-            UserResponse response = userService.patchUserEntity(id, body);
-            return ResponseEntity.ok(response);
+            if (security.validate(auth, id, UserRole.user))
+            {
+                UserResponse response = userService.patchUserEntity(id, body);
+                return ResponseEntity.ok(response);
+            }
+            else
+            {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
         } catch (AccountNotFoundException e){
             return ResponseEntity.badRequest().body(e);
+        }
+        catch (ServiceUnavailableException e)
+        {
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
         }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUserAndProfile(@RequestHeader("Authorization") String auth, @PathVariable("id") Integer id) {
 
-        //TODO auth
-
         try{
-            userService.deleteUserById(id);//on delete cascade
-            return ResponseEntity.ok(id);
-        } catch (Exception e){
+            if (security.validate(auth, id, UserRole.super_user))
+            {
+                userService.deleteUserById(id);//on delete cascade
+                return ResponseEntity.ok(id);
+            }
+            else
+            {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+        } 
+        catch (ServiceUnavailableException e)
+        {
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
+        }
+        catch (Exception e){
             return ResponseEntity.badRequest().body(e);
         }
     }
@@ -81,10 +104,23 @@ public class UserController {
     @GetMapping("")
     public ResponseEntity<List<UserResponse>> getUsers(@RequestHeader("Authorization") String auth)
     {
-        //TODO auth
+        try
+        {
+            if (security.validate(auth, UserRole.super_user))
+            {    
+                List<UserResponse> users = userService.getAllUsers();
+                return ResponseEntity.ok(users);
+            }
+            else
+            {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+        }
+        catch (ServiceUnavailableException e)
+        {
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
+        }
 
-        List<UserResponse> users = userService.getAllUsers();
-        return ResponseEntity.ok(users);
     }
 
     @PatchMapping("/{id}/perms")
@@ -93,22 +129,33 @@ public class UserController {
         @PathVariable Integer id,
         @RequestBody Integer role
     ) {
-        //TODO auth
         try
         {
-            userService.setRole(id, UserRole.of(role));
-            return ResponseEntity.ok().build();
+            if (security.validate(auth, UserRole.super_user))
+            {
+                userService.setRole(id, UserRole.of(role));
+                return ResponseEntity.ok().build();
+            }
+            else
+            {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
         }
         catch (NoSuchElementException e)
         {
             //not present
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e);
+        }
+        catch (ServiceUnavailableException e)
+        {
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(e);
         }
     }
 
     @Autowired
-    public UserController(UserService userService)
+    public UserController(UserService userService, SecurityHelper security)
     {
         this.userService = userService;
+        this.security = security;
     }
 }

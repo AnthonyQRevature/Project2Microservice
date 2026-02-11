@@ -2,13 +2,16 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"label": "Produce Jar",
+			"label": "Install Util",
 			"type": "process",
 			"command": "mvn",
 			"args": [
 				"install"
 			],
-			"problemMatcher": []
+			"problemMatcher": [],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			}
 		}
 	]
 }

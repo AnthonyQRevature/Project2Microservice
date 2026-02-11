@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.example.DefaultPfp;
 import com.example.HasherUtil;
 import com.example.TokenUtil;
+import com.example.TokenUtil.Token;
 import com.example.UserRole;
 import com.example.auth_server.repository.AuthDao;
 import com.example.entity.UserEntity;
@@ -100,17 +101,37 @@ public class AuthService {
         }
     }*/
 
+    public AuthResponse validateToken(String auth, Integer userId, UserRole requiredRole)
+    {
+        var token = jwtUtil.asToken(auth);
+        if (token.getId() != userId)
+        {
+            return new AuthResponse(auth, false);
+        }
+        else
+        {
+            boolean valid = validateToken(token, requiredRole);
+            return new AuthResponse(auth, valid);
+        }
+    }
+
     public AuthResponse validateToken(String auth, UserRole requiredRole)
     {
         var token = jwtUtil.asToken(auth);
-        if (!token.isValid() || token.isExpired())
-            return new AuthResponse(auth, false);
+        boolean valid = validateToken(token, requiredRole);
+        return new AuthResponse(auth, valid);
+    }
+
+    public boolean validateToken(Token token, UserRole requiredRole)
+    {
+        if (!token.isValid() || token.isExpired()) return false;
+
         Optional<UserEntity> user = authDao.findById(token.getId());
-        if (user.isEmpty())
-            return new AuthResponse(auth, false);
+        if (user.isEmpty()) return false;
+        
         UserRole role = user.get().getRole();
-        if (role.value < requiredRole.value)
-            return new AuthResponse(auth, false);
-        return new AuthResponse(auth, true);
+        if (role.value < requiredRole.value) return false;
+        
+        return true;
     }
 }
