@@ -24,6 +24,17 @@ public class PostEntity {
 
 }
 /*
+ID: Int
+Seller id: int	// references a record in another server.
+title: String
+price: double
+created_at: Date
+last_edited: Date
+media_encoded: String
+tags: String[] // also cache a list of all tags locally
+ */
+
+/*
 CREATE TABLE IF NOT EXISTS post (
     id SERIAL PRIMARY KEY,
     seller_id INT REFERENCES users(id) ON DELETE CASCADE,
