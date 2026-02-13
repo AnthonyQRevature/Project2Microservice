@@ -1,4 +1,4 @@
-package com.example.entity;
+package com.example.repository;
 
 import java.util.Objects;
 
@@ -43,7 +43,6 @@ public class UserEntity {
     @Column(name="username")
     private String username;
     private String email;
-    private String passwordHash;
     @Enumerated(EnumType.STRING)
     //Hibernate 6
     //otherwise we'd need to use native query
@@ -57,23 +56,16 @@ public class UserEntity {
     public UserEntity() {
     }
 
-    public UserEntity(UserEntity o)
-    {
-        this(o.email, o.passwordHash, o.role, o.id, o.username, o.verifiedSeller);
-    }
-
-    public UserEntity(String email, String passwordHash, UserRole role, Integer user_id, String username, Boolean verifiedSeller) {
+    public UserEntity(String email, UserRole role, Integer user_id, String username, Boolean verifiedSeller) {
         this.email = email;
-        this.passwordHash = passwordHash;
         this.role = role;
         this.id = user_id;
         this.username = username;
         this.verifiedSeller = verifiedSeller;
     }
 
-    public UserEntity(String email, String passwordHash, UserRole role, String username, Boolean verifiedSeller) {
+    public UserEntity(String email, UserRole role, String username, Boolean verifiedSeller) {
         this.email = email;
-        this.passwordHash = passwordHash;
         this.role = role;
         this.username = username;
         this.verifiedSeller = verifiedSeller;
@@ -103,14 +95,6 @@ public class UserEntity {
         this.email = email;
     }
 
-    public String getPasswordHash() {
-        return passwordHash;
-    }
-
-    public void setPasswordHash(String passwordHash) {
-        this.passwordHash = passwordHash;
-    }
-
     public UserRole getRole() {
         return role;
     }
@@ -133,7 +117,6 @@ public class UserEntity {
         hash = 29 * hash + Objects.hashCode(this.id);
         hash = 29 * hash + Objects.hashCode(this.username);
         hash = 29 * hash + Objects.hashCode(this.email);
-        hash = 29 * hash + Objects.hashCode(this.passwordHash);
         hash = 29 * hash + Objects.hashCode(this.role);
         hash = 29 * hash + Objects.hashCode(this.verifiedSeller);
         return hash;
@@ -157,9 +140,6 @@ public class UserEntity {
         if (!Objects.equals(this.email, other.email)) {
             return false;
         }
-        if (!Objects.equals(this.passwordHash, other.passwordHash)) {
-            return false;
-        }
         if (!Objects.equals(this.role, other.role)) {
             return false;
         }
@@ -176,7 +156,6 @@ public class UserEntity {
         sb.append("user_id=").append(id);
         sb.append(", username=").append(username);
         sb.append(", email=").append(email);
-        sb.append(", passwordHash=").append(passwordHash);
         sb.append(", role=").append(role);
         sb.append(", verifiedSeller=").append(verifiedSeller);
         sb.append('}');

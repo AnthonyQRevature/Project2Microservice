@@ -1,7 +1,6 @@
 package com.example.model;
 
-import com.example.entity.UserEntity;
-import com.example.entity.UserProfileEntity;
+import java.util.Objects;
 
 public class UserResponse {
     int id;
@@ -11,6 +10,62 @@ public class UserResponse {
     Boolean verified_seller;
     ProfileResponse profile;
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("UserResponse{");
+        sb.append("id=").append(id);
+        sb.append(", role=").append(role);
+        sb.append(", username=").append(username);
+        sb.append(", email=").append(email);
+        sb.append(", verified_seller=").append(verified_seller);
+        sb.append(", profile=").append(profile);
+        sb.append('}');
+        return sb.toString();
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 29 * hash + this.id;
+        hash = 29 * hash + Objects.hashCode(this.role);
+        hash = 29 * hash + Objects.hashCode(this.username);
+        hash = 29 * hash + Objects.hashCode(this.email);
+        hash = 29 * hash + Objects.hashCode(this.verified_seller);
+        hash = 29 * hash + Objects.hashCode(this.profile);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final UserResponse other = (UserResponse) obj;
+        if (this.id != other.id) {
+            return false;
+        }
+        if (!Objects.equals(this.username, other.username)) {
+            return false;
+        }
+        if (!Objects.equals(this.email, other.email)) {
+            return false;
+        }
+        if (!Objects.equals(this.role, other.role)) {
+            return false;
+        }
+        if (!Objects.equals(this.verified_seller, other.verified_seller)) {
+            return false;
+        }
+        return Objects.equals(this.profile, other.profile);
+    }
+
     public static class ProfileResponse 
     {
         String pfp_encoded;
@@ -18,21 +73,54 @@ public class UserResponse {
         Double latitude;
         Double longitude;
 
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + ((pfp_encoded == null) ? 0 : pfp_encoded.hashCode());
+            result = prime * result + ((bio == null) ? 0 : bio.hashCode());
+            result = prime * result + ((latitude == null) ? 0 : latitude.hashCode());
+            result = prime * result + ((longitude == null) ? 0 : longitude.hashCode());
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            ProfileResponse other = (ProfileResponse) obj;
+            if (pfp_encoded == null) {
+                if (other.pfp_encoded != null)
+                    return false;
+            } else if (!pfp_encoded.equals(other.pfp_encoded))
+                return false;
+            if (bio == null) {
+                if (other.bio != null)
+                    return false;
+            } else if (!bio.equals(other.bio))
+                return false;
+            if (latitude == null) {
+                if (other.latitude != null)
+                    return false;
+            } else if (!latitude.equals(other.latitude))
+                return false;
+            if (longitude == null) {
+                if (other.longitude != null)
+                    return false;
+            } else if (!longitude.equals(other.longitude))
+                return false;
+            return true;
+        }
+
         public ProfileResponse(String bio, Double latitude, Double longitude, String pfp_encoded) {
             this.bio = bio;
             this.latitude = latitude;
             this.longitude = longitude;
             this.pfp_encoded = pfp_encoded;
-        }
-
-        public ProfileResponse(UserProfileEntity entity)
-        {
-            this(
-                entity.getBio(),
-                entity.getLatitude(),
-                entity.getLongitude(),
-                entity.getPfpEncoded()
-            );
         }
 
         public String getPfp_encoded() {
@@ -62,6 +150,18 @@ public class UserResponse {
         public void setLongitude(Double longitude) {
             this.longitude = longitude;
         }
+
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            sb.append("ProfileResponse{");
+            sb.append("pfp_encoded=").append(pfp_encoded);
+            sb.append(", bio=").append(bio);
+            sb.append(", latitude=").append(latitude);
+            sb.append(", longitude=").append(longitude);
+            sb.append('}');
+            return sb.toString();
+        }
     }
 
     public UserResponse(String email, int id, ProfileResponse profile, Integer role, String username, Boolean verified_seller) {
@@ -71,18 +171,6 @@ public class UserResponse {
         this.role = role;
         this.username = username;
         this.verified_seller = verified_seller;
-    }
-
-    public UserResponse(UserEntity entity)
-    {
-        this(
-            entity.getEmail(), 
-            entity.getId(), 
-            new ProfileResponse(entity.getUserProfile()),
-            entity.getRole().value,
-            entity.getUsername(),
-            entity.getVerifiedSeller()
-        );
     }
 
     public int getId() {

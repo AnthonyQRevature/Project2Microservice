@@ -9,11 +9,13 @@ import javax.security.auth.login.AccountNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.Marshaller;
 import com.example.UserRole;
-import com.example.entity.UserEntity;
 import com.example.model.UserResponse;
 import com.example.model.UserUpdateRequest;
 import com.example.repository.UserDao;
+import com.example.repository.UserEntity;
+import com.example.repository.UserProfileEntity;
 
 import jakarta.transaction.Transactional;
 
@@ -23,26 +25,24 @@ import jakarta.transaction.Transactional;
 @Service
 public class UserService {
 
-    static List<UserResponse> toModel(List<UserEntity> entity)
-    {
-        return entity.stream().map(e -> toModel(e)).toList();
-    }
-    static Optional<UserResponse> toModel(Optional<UserEntity> entity)
-    {
-        if (entity.isPresent())
-        {
-            return Optional.of(toModel(entity.get()));
-        }
-        else
-        {
-            return Optional.empty();
-        }
-    }
-    static UserResponse toModel(UserEntity entity)
-    {
-        return new UserResponse(entity);
-    }
-
+    Marshaller<UserResponse.ProfileResponse, UserProfileEntity> profileMarshaller = new Marshaller<>((e) -> {
+        return new UserResponse.ProfileResponse(
+            e.getBio(),
+            e.getLatitude(),
+            e.getLongitude(),
+            e.getPfpEncoded()
+        );
+    });
+    Marshaller<UserResponse, UserEntity> marshaller = new Marshaller<>((e) -> {
+        return new UserResponse(
+            e.getEmail(),
+            e.getId(),
+            profileMarshaller.convert(e.getUserProfile()),
+            e.getRole().value,
+            e.getUsername(),
+            e.getVerifiedSeller()
+        );
+    });
     UserDao dao;
 
     @Transactional
@@ -58,11 +58,11 @@ public class UserService {
             if (body.getProfile().getLongitude() != null) entity.getUserProfile().setLongitude(body.getProfile().getLongitude());
         }
 
-        return toModel(entity);
+        return marshaller.convert(entity);
     }
     
     public Optional<UserResponse> findByUsername(String username){
-        return toModel(dao.findUserByUsername(username));
+        return marshaller.convert(dao.findUserByUsername(username));
     }
 
     public boolean deleteUserById(int id){
@@ -73,11 +73,11 @@ public class UserService {
     }
 
     public List<UserResponse> getAllUsers() {
-        return toModel(dao.findAll());
+        return marshaller.convert(dao.findAll());
     }
 
     public Optional<UserResponse> findById(Integer id) {
-        return toModel(dao.findById(id));
+        return marshaller.convert(dao.findById(id));
     }
 
     @Transactional
