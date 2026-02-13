@@ -14,7 +14,6 @@ import com.example.TokenUtil.TokenProperties;
 
 @SpringBootApplication
 @EnableDiscoveryClient
-@EntityScan(basePackages="com.example.entity")
 @ConfigurationPropertiesScan(basePackages="com.example")
 public class AuthServerApplication {
 

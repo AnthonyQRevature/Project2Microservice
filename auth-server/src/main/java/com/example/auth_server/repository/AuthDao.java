@@ -4,9 +4,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.example.entity.UserEntity;
-
-public interface AuthDao extends JpaRepository<UserEntity, Integer>{
+public interface AuthDao extends JpaRepository<AuthEntity, Integer>{
     
-    Optional<UserEntity> findByUsername(String username);
+    Optional<AuthEntity> findByUsername(String username);
 }

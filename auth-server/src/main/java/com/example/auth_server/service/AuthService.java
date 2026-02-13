@@ -5,14 +5,12 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.example.DefaultPfp;
 import com.example.HasherUtil;
 import com.example.TokenUtil;
 import com.example.TokenUtil.Token;
 import com.example.UserRole;
 import com.example.auth_server.repository.AuthDao;
-import com.example.entity.UserEntity;
-import com.example.entity.UserProfileEntity;
+import com.example.auth_server.repository.AuthEntity;
 import com.example.exception.AuthenticationException;
 import com.example.exception.DatabaseConflictException;
 import com.example.exception.InvalidCredentialsException;
@@ -22,7 +20,7 @@ import com.example.model.LoginResponse;
 import com.example.model.RegisterRequest;
 
 @Service
-@SuppressWarnings("UnnecessaryReturnStatement")
+@SuppressWarnings({"UnnecessaryReturnStatement"})
 public class AuthService {
 
     @Autowired
@@ -31,8 +29,6 @@ public class AuthService {
     private TokenUtil jwtUtil;
     @Autowired
     private HasherUtil hasher;
-    @Autowired
-    private DefaultPfp defaultPfp;
 
     public LoginResponse validateLogin(LoginRequest login) throws AuthenticationException {
         var user = authDao.findByUsername(login.getUsername())
@@ -50,8 +46,6 @@ public class AuthService {
     public void registerNewUser(RegisterRequest user) 
         throws InvalidCredentialsException, DatabaseConflictException
     {
-        UserEntity entity = new UserEntity();
-
         //TODO check password requirements, email existence, etc.
         if (user.getPassword().length() < 8)
         {
@@ -59,15 +53,16 @@ public class AuthService {
         }
 
         //check existence
-        if (authDao.findByUsername(user.getUsername()).isEmpty())
+        if (!authDao.findByUsername(user.getUsername()).isEmpty())
         {
             //already in db
             throw new DatabaseConflictException();
             //return ResponseEntity.status(409).build();
         }
         else
-        {//potentially factor conversions into a seperate method
-
+        {
+            /*
+            //TODO move this to the user dao
             //conversion from model to entity
             //dao.save will return an entity, guarenteed nonnull
             //this entity will have it's ID field filled in unlike the one that is passed into the function
@@ -86,20 +81,17 @@ public class AuthService {
             entity.setUserProfile(profileEntity);
             
             authDao.save(entity);
+            */
+
+            String hashedPassword = hasher.hashPassword(user.getPassword());
+            AuthEntity newAuth = new AuthEntity(null, hashedPassword, UserRole.user, user.getUsername());
+
+            authDao.save(newAuth);
             
             //success
             return;
         }
     }
-
-    /*
-    public AuthResponse validateToken(String token){
-        if(jwtUtil.validateToken(token)){
-            return new AuthResponse(token, true);
-        }else{
-            return new AuthResponse(token, false);
-        }
-    }*/
 
     public AuthResponse validateToken(String auth, Integer userId, UserRole requiredRole)
     {
@@ -126,12 +118,14 @@ public class AuthService {
     {
         if (!token.isValid() || token.isExpired()) return false;
 
-        Optional<UserEntity> user = authDao.findById(token.getId());
+        Optional<AuthEntity> user = authDao.findById(token.getId());
         if (user.isEmpty()) return false;
         
         UserRole role = user.get().getRole();
-        if (role.value < requiredRole.value) return false;
         
-        return true;
+        if (role.value < requiredRole.value) 
+            return false;
+        else 
+            return true;
     }
 }
