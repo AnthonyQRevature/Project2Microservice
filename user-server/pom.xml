@@ -84,6 +84,11 @@
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+				<version>4.0.2</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 

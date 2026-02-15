@@ -1,12 +1,15 @@
 package com.example.demo;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import org.junit.jupiter.api.Test;
-import static org.mockito.Mockito.when;
-
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import static org.mockito.Mockito.when;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.hibernate.autoconfigure.HibernateJpaAutoConfiguration;
@@ -16,7 +19,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.cloud.netflix.eureka.EurekaClientAutoConfiguration;
 import org.springframework.cloud.netflix.eureka.EurekaDiscoveryClientConfiguration;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 
@@ -38,6 +40,7 @@ import com.example.repository.UserProfileEntity;
     DataSourceTransactionManagerAutoConfiguration.class,
     HibernateJpaAutoConfiguration.class
 })
+@ExtendWith(MockitoExtension.class)
 class DemoApplicationTests {
 
 	@MockitoBean
@@ -46,11 +49,11 @@ class DemoApplicationTests {
 	UserDao dao;
 
 	String myAuth = "jwttoken";
-	UserEntity myUser;
-	UserEntity sampleUser;
+	static UserEntity myUser;
+	static UserEntity sampleUser;
 
-	//@BeforeAll
-	public void initData()
+	@BeforeAll
+	public static void initData()
 	{
 		myUser = new UserEntity("my@email", UserRole.user, 42, "myUsername", false);
 		myUser.setUserProfile(new UserProfileEntity("address", "bio", 42, 100.0d, 200.0d, "pfp"));
@@ -74,7 +77,6 @@ class DemoApplicationTests {
 
 	@Test // If AssertJ is on the classpath, you can use MockMvcTester
 	void testWithMockMvcTester(@Autowired MockMvcTester mvc) {
-		initData();
 		UserResponse expectedResponse = new UserResponse(
 			"email", 
 			1, 
@@ -96,4 +98,6 @@ class DemoApplicationTests {
 				.bodyJson().convertTo(UserResponse.class)
 				.isEqualTo(expectedResponse);
 	}
+
+	
 }

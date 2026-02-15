@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Test",
+            "request": "launch",
+            "mainClass": "com.example.demo.Test",
+            "projectName": "demo"
+        },
+        {
+            "type": "java",
             "name": "Test Config",
             "request": "launch",
             "mainClass": "${file}",
