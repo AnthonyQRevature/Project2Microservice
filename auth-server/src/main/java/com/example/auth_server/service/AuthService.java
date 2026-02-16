@@ -1,5 +1,6 @@
 package com.example.auth_server.service;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -7,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.HasherUtil;
+import com.example.Marshaller;
 import com.example.TokenUtil;
 import com.example.TokenUtil.Token;
 import com.example.UserRole;
@@ -16,6 +18,7 @@ import com.example.exception.AuthenticationException;
 import com.example.exception.DatabaseConflictException;
 import com.example.exception.InvalidCredentialsException;
 import com.example.model.AuthResponse;
+import com.example.model.CredentialResponse;
 import com.example.model.LoginRequest;
 import com.example.model.LoginResponse;
 import com.example.model.RegisterCredentialsRequest;
@@ -30,6 +33,8 @@ public class AuthService {
     private TokenUtil jwtUtil;
     @Autowired
     private HasherUtil hasher;
+    @Autowired
+    public Marshaller<CredentialResponse, AuthEntity> credentialMarshaller;
 
     public LoginResponse validateLogin(LoginRequest login) throws AuthenticationException {
         var user = authDao.findByUsername(login.getUsername())
@@ -140,5 +145,9 @@ public class AuthService {
         AuthEntity entity = authDao.findById(userId).orElseThrow();
         entity.setRole(UserRole.of(role));
         return true;
+    }
+
+    public List<CredentialResponse> getAll() {
+        return credentialMarshaller.convert(authDao.findAll());
     }
 }

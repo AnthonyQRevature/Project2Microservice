@@ -22,6 +22,7 @@ import org.springframework.cloud.netflix.eureka.EurekaDiscoveryClientConfigurati
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 
+import com.example.TokenUtil;
 import com.example.UserRole;
 import com.example.clients.AuthClient;
 import com.example.model.AuthResponse;

@@ -9,8 +9,11 @@ import org.springframework.context.annotation.Bean;
 
 import com.example.DefaultPfp;
 import com.example.HasherUtil;
+import com.example.Marshaller;
 import com.example.TokenUtil;
 import com.example.TokenUtil.TokenProperties;
+import com.example.auth_server.repository.AuthEntity;
+import com.example.model.CredentialResponse;
 
 @SpringBootApplication
 @EnableDiscoveryClient
@@ -35,5 +38,11 @@ public class AuthServerApplication {
 	public HasherUtil hasher()
 	{
 		return new HasherUtil();
+	}
+	@Bean
+	public Marshaller<CredentialResponse, AuthEntity> credentialMarshaller() {
+		return new Marshaller<>((e) -> {
+			return new CredentialResponse(e.getId(), e.getRole().value, e.getUsername());
+		});
 	}
 }

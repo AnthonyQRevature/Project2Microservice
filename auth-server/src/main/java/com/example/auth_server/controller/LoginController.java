@@ -1,5 +1,6 @@
 package com.example.auth_server.controller;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import com.example.exception.AuthenticationException;
 import com.example.exception.DatabaseConflictException;
 import com.example.exception.InvalidCredentialsException;
 import com.example.model.AuthResponse;
+import com.example.model.CredentialResponse;
 import com.example.model.LoginRequest;
 import com.example.model.LoginResponse;
 import com.example.model.RegisterCredentialsRequest;
@@ -76,6 +78,21 @@ public class LoginController {
         }
     }
 
+    @GetMapping("/credentials")
+    public ResponseEntity<List<CredentialResponse>> getAll(
+        @RequestHeader("Authorization") String auth
+    ) {
+        if (service.validate(auth, UserRole.super_user))
+        {
+            List<CredentialResponse> response = service.getAll();
+            return ResponseEntity.ok(response);
+        }
+        else
+        {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+    }
+
     /*
     @GetMapping("/")
     public AuthResponse verifyToken(@RequestHeader("Authorization") String auth)
@@ -122,8 +139,7 @@ public class LoginController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
-
-
+    
     @Autowired
     public LoginController(AuthService authService) 
     { 

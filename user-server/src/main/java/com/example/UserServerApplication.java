@@ -21,4 +21,9 @@ public class UserServerApplication {
 	{
 		return new SecurityHelper(client);
 	}
+	@Bean
+	public DefaultPfp defaultPfp()
+	{
+		return new DefaultPfp();
+	}
 }
