@@ -10,11 +10,7 @@
 			],
 			"options": {
 				"cwd": "${workspaceFolder}/eureka-demo",
-				"env": {
-
-				}
 			},
-			
 			"problemMatcher": []
 		},
 		{

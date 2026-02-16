@@ -1,4 +1,4 @@
-package com.example.entity;
+package com.example.repository;
 
 import java.util.Objects;
 

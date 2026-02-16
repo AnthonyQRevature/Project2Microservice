@@ -1,0 +1,32 @@
+services:
+  db:
+    image:
+      postgres
+    environment:
+      POSTGRES_PASSWORD: secret
+    networks:
+       - app-network
+#  eureka:
+#    build:
+#      context: ./eureka-demo
+#      dockerfile: Dockerfile
+#    container_name: eureka
+#    networks:
+#     - app-network
+  backend:
+    build:
+      context: ./user-server # Path to your spring project
+      dockerfile: Dockerfile
+    container_name: user
+#    depends_on:
+#       - eureka
+    links:
+       - "db:database"
+    ports:
+      - "8080:8080"
+    networks:
+      - app-network
+  
+networks:
+  app-network:
+    driver: bridge

@@ -1,0 +1,26 @@
+services:
+  user_db:
+    build:
+      context: ./database
+      dockerfile: Dockerfile
+    environment:
+      POSTGRES_PASSWORD: secret
+    networks:
+       - user-network
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: user
+#    depends_on:
+#       - eureka
+    links:
+       - "user_db:database"
+    ports:
+      - "8080:8080"
+    networks:
+      - user-network
+  
+networks:
+  user-network:
+    driver: bridge
