@@ -1,5 +1,6 @@
 package com.example.auth_server.service;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,7 @@ import com.example.exception.InvalidCredentialsException;
 import com.example.model.AuthResponse;
 import com.example.model.LoginRequest;
 import com.example.model.LoginResponse;
-import com.example.model.RegisterRequest;
+import com.example.model.RegisterCredentialsRequest;
 
 @Service
 @SuppressWarnings({"UnnecessaryReturnStatement"})
@@ -43,7 +44,7 @@ public class AuthService {
         return loginResponse;
     }
 
-    public void registerNewUser(RegisterRequest user) 
+    public void registerNewUser(RegisterCredentialsRequest user) 
         throws InvalidCredentialsException, DatabaseConflictException
     {
         //TODO check password requirements, email existence, etc.
@@ -102,7 +103,7 @@ public class AuthService {
         }
         else
         {
-            boolean valid = validateToken(token, requiredRole);
+            boolean valid = validate(token, requiredRole);
             return new AuthResponse(auth, valid);
         }
     }
@@ -110,11 +111,17 @@ public class AuthService {
     public AuthResponse validateToken(String auth, UserRole requiredRole)
     {
         var token = jwtUtil.asToken(auth);
-        boolean valid = validateToken(token, requiredRole);
+        boolean valid = validate(token, requiredRole);
         return new AuthResponse(auth, valid);
     }
 
-    public boolean validateToken(Token token, UserRole requiredRole)
+    public boolean validate(String auth, UserRole requiredRole)
+    {
+        var token = jwtUtil.asToken(auth);
+        return validate(token, requiredRole);
+    }
+
+    public boolean validate(Token token, UserRole requiredRole)
     {
         if (!token.isValid() || token.isExpired()) return false;
 
@@ -127,5 +134,11 @@ public class AuthService {
             return false;
         else 
             return true;
+    }
+
+    public boolean updatePerms(Integer userId, Integer role) throws NoSuchElementException {
+        AuthEntity entity = authDao.findById(userId).orElseThrow();
+        entity.setRole(UserRole.of(role));
+        return true;
     }
 }

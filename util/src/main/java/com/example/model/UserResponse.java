@@ -1,69 +1,74 @@
 package com.example.model;
 
-import java.util.Objects;
-
 public class UserResponse {
     int id;
-    Integer role;
     String username;
     String email;
     Boolean verified_seller;
     ProfileResponse profile;
+
+    public UserResponse() {
+    }
+
+    public UserResponse(String email, int id, ProfileResponse profile, String username, Boolean verified_seller) {
+        this.email = email;
+        this.id = id;
+        this.profile = profile;
+        this.username = username;
+        this.verified_seller = verified_seller;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public Boolean getVerified_seller() {
+        return verified_seller;
+    }
+
+    public void setVerified_seller(Boolean verified_seller) {
+        this.verified_seller = verified_seller;
+    }
+
+    public ProfileResponse getProfile() {
+        return profile;
+    }
+
+    public void setProfile(ProfileResponse profile) {
+        this.profile = profile;
+    }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("UserResponse{");
         sb.append("id=").append(id);
-        sb.append(", role=").append(role);
         sb.append(", username=").append(username);
         sb.append(", email=").append(email);
         sb.append(", verified_seller=").append(verified_seller);
         sb.append(", profile=").append(profile);
         sb.append('}');
         return sb.toString();
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 29 * hash + this.id;
-        hash = 29 * hash + Objects.hashCode(this.role);
-        hash = 29 * hash + Objects.hashCode(this.username);
-        hash = 29 * hash + Objects.hashCode(this.email);
-        hash = 29 * hash + Objects.hashCode(this.verified_seller);
-        hash = 29 * hash + Objects.hashCode(this.profile);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final UserResponse other = (UserResponse) obj;
-        if (this.id != other.id) {
-            return false;
-        }
-        if (!Objects.equals(this.username, other.username)) {
-            return false;
-        }
-        if (!Objects.equals(this.email, other.email)) {
-            return false;
-        }
-        if (!Objects.equals(this.role, other.role)) {
-            return false;
-        }
-        if (!Objects.equals(this.verified_seller, other.verified_seller)) {
-            return false;
-        }
-        return Objects.equals(this.profile, other.profile);
     }
 
     public static class ProfileResponse 
@@ -164,55 +169,51 @@ public class UserResponse {
         }
     }
 
-    public UserResponse(String email, int id, ProfileResponse profile, Integer role, String username, Boolean verified_seller) {
-        this.email = email;
-        this.id = id;
-        this.profile = profile;
-        this.role = role;
-        this.username = username;
-        this.verified_seller = verified_seller;
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + id;
+        result = prime * result + ((username == null) ? 0 : username.hashCode());
+        result = prime * result + ((email == null) ? 0 : email.hashCode());
+        result = prime * result + ((verified_seller == null) ? 0 : verified_seller.hashCode());
+        result = prime * result + ((profile == null) ? 0 : profile.hashCode());
+        return result;
     }
 
-    public int getId() {
-        return id;
-    }
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public Boolean isVerified_seller() {
-        return verified_seller;
-    }
-    public void setVerified_seller(Boolean verified_seller) {
-        this.verified_seller = verified_seller;
-    }
-
-    public ProfileResponse getProfile() {
-        return profile;
-    }
-    public void setProfile(ProfileResponse profileResponse) {
-        this.profile = profileResponse;
-    }
-
-    public Integer getRole() {
-        return role;
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        UserResponse other = (UserResponse) obj;
+        if (id != other.id)
+            return false;
+        if (username == null) {
+            if (other.username != null)
+                return false;
+        } else if (!username.equals(other.username))
+            return false;
+        if (email == null) {
+            if (other.email != null)
+                return false;
+        } else if (!email.equals(other.email))
+            return false;
+        if (verified_seller == null) {
+            if (other.verified_seller != null)
+                return false;
+        } else if (!verified_seller.equals(other.verified_seller))
+            return false;
+        if (profile == null) {
+            if (other.profile != null)
+                return false;
+        } else if (!profile.equals(other.profile))
+            return false;
+        return true;
     }
 
-    public void setRole(Integer role) {
-        this.role = role;
-    }
+    
 }

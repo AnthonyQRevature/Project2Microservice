@@ -55,11 +55,22 @@ class DemoApplicationTests {
 	@BeforeAll
 	public static void initData()
 	{
-		myUser = new UserEntity("my@email", UserRole.user, 42, "myUsername", false);
-		myUser.setUserProfile(new UserProfileEntity("address", "bio", 42, 100.0d, 200.0d, "pfp"));
+		myUser = new UserEntity(
+			"my@email",
+			42,
+			new UserProfileEntity("address", "bio", 42, 100.0d, 200.0d, "pfp"),
+			"myUsername",
+			false
+		);
+		
 
-		sampleUser = new UserEntity("email", UserRole.user, 1, "username", false);
-		sampleUser.setUserProfile(new UserProfileEntity("address", "bio", 1, 3.0d, 200.0d, "pfp"));
+		sampleUser = new UserEntity(
+			"email", 
+			1, 
+			new UserProfileEntity("address", "bio", 1, 3.0d, 200.0d, "pfp"),
+			"username", 
+			false
+		);
 	}
 
 	@Test
@@ -68,7 +79,7 @@ class DemoApplicationTests {
 
 	void authServerAccepts()
 	{
-		when(auth.verifyToken(myAuth, myUser.getRole().value)).thenReturn(new AuthResponse(myAuth, true));
+		when(auth.verifyToken(myAuth, UserRole.user.value)).thenReturn(new AuthResponse(myAuth, true));
 	}
 	void daoReturnsUser()
 	{
@@ -86,7 +97,6 @@ class DemoApplicationTests {
 				200.0d,
 				"pfp"
 			), 
-			1, 
 			"username", 
 			false
 		);

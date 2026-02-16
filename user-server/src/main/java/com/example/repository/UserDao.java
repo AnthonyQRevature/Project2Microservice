@@ -6,4 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UserDao extends JpaRepository<UserEntity, Integer>{
     Optional<UserEntity> findUserByUsername(String username);
+    boolean existsByUsername(String username);
 }
