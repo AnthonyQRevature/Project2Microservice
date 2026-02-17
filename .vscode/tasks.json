@@ -54,19 +54,6 @@
 			"problemMatcher": []
 		},
 		{
-			"label": "Docker Run Auth Server",
-			"type": "process",
-			"command": "docker-compose",
-			"args": [
-				"up",
-				"--build"
-			],
-			"problemMatcher": [],
-			"options": {
-				"cwd": "${workspaceFolder}/auth-server"
-			}
-		},
-		{
 			"label": "User Server",
 			"type": "shell",
 			"command": "C:/Program Files/Git/bin/bash.exe",
@@ -78,19 +65,6 @@
 				"cwd": "${workspaceFolder}/user-server"
 			},
 			"problemMatcher": []
-		},
-		{
-			"label": "Docker Run User Server",
-			"type": "process",
-			"command": "docker-compose",
-			"args": [
-				"up",
-				"--build"
-			],
-			"problemMatcher": [],
-			"options": {
-				"cwd": "${workspaceFolder}/user-server"
-			}
 		},
 		{
 			"label": "Install Util",

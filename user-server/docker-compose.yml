@@ -7,6 +7,10 @@ services:
       POSTGRES_PASSWORD: secret
     networks:
        - user-network
+    ports:
+      # expose the database for testing
+       - "5433:5432"
+
   user_server:
     build:
       context: .
@@ -16,8 +20,6 @@ services:
        - eureka
     links:
        - "user_db:database"
-#    ports:
-#      - "8082:8082"
     networks:
       - user-network
       - eureka-network
