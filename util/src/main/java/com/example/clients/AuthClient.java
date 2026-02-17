@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.example.model.AuthResponse;
 import com.example.model.RegisterCredentialsRequest;
 
-@FeignClient(name="auth-service", path="auth")
+@FeignClient(name="auth-service", path="/auth")
 public interface AuthClient {
     @GetMapping("")
     AuthResponse verifyToken(

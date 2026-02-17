@@ -2,14 +2,28 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
+			"label": "Docker Run Eureka Server",
+			"type": "shell",
+			"command": "docker-compose",
+			"args": [
+				"up",
+				"--build"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": []
+		},
+		{
 			"label": "Eureka Server",
 			"type": "shell",
 			"command": "C:/Program Files/Git/bin/bash.exe",
 			"args": [
-				"./mvnw", "spring-boot:run"
+				"./mvnw",
+				"spring-boot:run"
 			],
 			"options": {
-				"cwd": "${workspaceFolder}/eureka-demo",
+				"cwd": "${workspaceFolder}/eureka-demo"
 			},
 			"problemMatcher": []
 		},
@@ -18,7 +32,8 @@
 			"type": "shell",
 			"command": "C:/Program Files/Git/bin/bash.exe",
 			"args": [
-				"./mvnw", "spring-boot:run"
+				"./mvnw",
+				"spring-boot:run"
 			],
 			"options": {
 				"cwd": "${workspaceFolder}/api-gateway-demo"
@@ -30,7 +45,8 @@
 			"type": "shell",
 			"command": "C:/Program Files/Git/bin/bash.exe",
 			"args": [
-				"./mvnw", "spring-boot:run"
+				"./mvnw",
+				"spring-boot:run"
 			],
 			"options": {
 				"cwd": "${workspaceFolder}/auth-server"
@@ -38,11 +54,25 @@
 			"problemMatcher": []
 		},
 		{
+			"label": "Docker Run Auth Server",
+			"type": "process",
+			"command": "docker-compose",
+			"args": [
+				"up",
+				"--build"
+			],
+			"problemMatcher": [],
+			"options": {
+				"cwd": "${workspaceFolder}/auth-server"
+			}
+		},
+		{
 			"label": "User Server",
 			"type": "shell",
 			"command": "C:/Program Files/Git/bin/bash.exe",
 			"args": [
-				"./mvnw", "spring-boot:run"
+				"./mvnw",
+				"spring-boot:run"
 			],
 			"options": {
 				"cwd": "${workspaceFolder}/user-server"
@@ -50,17 +80,16 @@
 			"problemMatcher": []
 		},
 		{
-			"label": "Start Eureka2",
-			"type": "shell",
-			"command": "Start-Process",
+			"label": "Docker Run User Server",
+			"type": "process",
+			"command": "docker-compose",
 			"args": [
-				"-FilePath",
-				"C:/WINDOWS/System32/cmd.exe",
-				"-ArgumentList",
-				"/K \"./mvnw spring-boot:run\""
+				"up",
+				"--build"
 			],
+			"problemMatcher": [],
 			"options": {
-				"cwd": ""
+				"cwd": "${workspaceFolder}/user-server"
 			}
 		},
 		{
@@ -69,6 +98,21 @@
 			"command": "mvn",
 			"args": [
 				"install"
+			],
+			"problemMatcher": [],
+			"options": {
+				"cwd": "${workspaceFolder}/util"
+			}
+		},
+		{
+			"label": "Docker Build Util",
+			"type": "process",
+			"command": "docker",
+			"args": [
+				"build",
+				"-t",
+				"util",
+				"."
 			],
 			"problemMatcher": [],
 			"options": {

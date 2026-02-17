@@ -1,6 +1,7 @@
 package com.example.model;
 
 public class RegisterCredentialsRequest {
+    Integer id;
     String username;
     String password;
 
@@ -20,4 +21,11 @@ public class RegisterCredentialsRequest {
         this.password = password;
     }
 
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 }

@@ -1,32 +1,25 @@
+include:
+  - ./user-server/docker-compose.yml
+  - ./auth-server/docker-compose.yml
+
 services:
-  db:
-    image:
-      postgres
-    environment:
-      POSTGRES_PASSWORD: secret
-    networks:
-       - app-network
-#  eureka:
-#    build:
-#      context: ./eureka-demo
-#      dockerfile: Dockerfile
-#    container_name: eureka
-#    networks:
-#     - app-network
-  backend:
+  eureka:
     build:
-      context: ./user-server # Path to your spring project
+      context: ./eureka-demo
       dockerfile: Dockerfile
-    container_name: user
-#    depends_on:
-#       - eureka
-    links:
-       - "db:database"
+    networks:
+       - eureka-network
+  gateway:
+    build:
+      context: ./api-gateway-demo
+      dockerfile: Dockerfile
+    depends_on:
+       - eureka
+    networks:
+       - eureka-network
     ports:
       - "8080:8080"
-    networks:
-      - app-network
-  
+
 networks:
-  app-network:
+  eureka-network:
     driver: bridge

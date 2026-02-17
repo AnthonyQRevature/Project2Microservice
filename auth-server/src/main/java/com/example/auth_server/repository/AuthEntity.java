@@ -8,8 +8,6 @@ import org.hibernate.dialect.type.PostgreSQLEnumJdbcType;
 import com.example.UserRole;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
@@ -17,7 +15,6 @@ import jakarta.persistence.Table;
 @Table(name="credentials")
 public class AuthEntity {
     @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
     Integer id;
     @JdbcType(PostgreSQLEnumJdbcType.class)
     UserRole role;
@@ -29,6 +26,9 @@ public class AuthEntity {
         this.passwordHash = passwordHash;
         this.role = role;
         this.username = username;
+    }
+
+    public AuthEntity() {
     }
 
     public String getUsername() {

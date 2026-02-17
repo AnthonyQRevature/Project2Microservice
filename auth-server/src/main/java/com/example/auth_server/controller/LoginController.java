@@ -66,6 +66,7 @@ public class LoginController {
     @PostMapping("/register")
     public ResponseEntity<RegisterRequest> registerUser(@RequestBody RegisterCredentialsRequest body)
     {
+        //TODO should not be exposed
         try {
             service.registerNewUser(body);
             return ResponseEntity.ok().build();

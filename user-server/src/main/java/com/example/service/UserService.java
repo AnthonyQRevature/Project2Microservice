@@ -19,6 +19,7 @@ import com.example.model.UserResponse;
 import com.example.model.UserUpdateRequest;
 import com.example.repository.UserDao;
 import com.example.repository.UserEntity;
+import com.example.repository.UserProfileDao;
 import com.example.repository.UserProfileEntity;
 
 import feign.FeignException;
@@ -52,6 +53,8 @@ public class UserService {
     AuthClient auth;
     @Autowired
     DefaultPfp defaultPfp;
+    @Autowired
+    UserProfileDao profileDao;
     UserDao dao;
 
     @Transactional
@@ -89,6 +92,7 @@ public class UserService {
         return marshaller.convert(dao.findById(id));
     }
 
+    @Transactional
     public boolean registerNewUser(RegisterRequest request) 
         throws DatabaseConflictException, FeignException
     {
@@ -98,21 +102,12 @@ public class UserService {
             throw new DatabaseConflictException();
         }
 
-        RegisterCredentialsRequest newCredentials = new RegisterCredentialsRequest();
-        newCredentials.setUsername(request.getUsername());
-        newCredentials.setPassword(request.getPassword());
-
-        var response = auth.registerUser(newCredentials);
-
-        if (response.getStatusCode() != HttpStatus.OK)
-        {
-            return false;
-        }
-
         //should replace with a factory pattern
-        UserEntity unmanaged = new UserEntity(
-            request.getEmail(),
-            null,
+        UserEntity unmanaged = UserEntity.makeUserEntity(
+            request.getEmail(), 
+            null, 
+            request.getUsername(), 
+            false, 
             new UserProfileEntity(
                 null,
                 null,
@@ -120,11 +115,19 @@ public class UserService {
                 null,
                 null,
                 defaultPfp.get()
-            ),
-            request.getUsername(),
-            false
+            )
         );
-        dao.save(unmanaged);
+        var managed = dao.save(unmanaged);
+
+        RegisterCredentialsRequest newCredentials = new RegisterCredentialsRequest();
+        newCredentials.setId(managed.getId());
+        newCredentials.setUsername(request.getUsername());
+        newCredentials.setPassword(request.getPassword());
+
+        if (auth.registerUser(newCredentials).getStatusCode() != HttpStatus.OK)
+        {
+            throw new DatabaseConflictException();
+        }
 
         return true;
     }
