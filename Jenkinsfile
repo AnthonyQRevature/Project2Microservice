@@ -69,6 +69,7 @@ pipeline {
                 sshagent([SSH_CREDENTIAL_ID]) {
 
                     // Compress
+                    sh "chmod +x ./zip_file.sh"
                     sh "./zip_files.sh"
 
                     // Transfer
