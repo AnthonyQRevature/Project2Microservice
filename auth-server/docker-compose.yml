@@ -1,29 +1,29 @@
 services:
-  user_db:
+  auth_db:
     build:
       context: ./database
       dockerfile: Dockerfile
     environment:
       POSTGRES_PASSWORD: secret
     networks:
-       - user-network
+       - auth-network
     ports:
       # expose the database for testing
-       - "5433:5432"
+       - "5432:5432"
 
-  user_server:
+  auth_server:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: user-service
+    container_name: auth-service
     depends_on:
        - eureka
     links:
-       - "user_db:database"
+       - "auth_db:database"
     networks:
-      - user-network
+      - auth-network
       - eureka-network
   
 networks:
-  user-network:
+  auth-network:
     driver: bridge

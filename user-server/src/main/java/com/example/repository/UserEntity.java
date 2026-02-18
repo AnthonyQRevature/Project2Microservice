@@ -5,8 +5,6 @@ import java.util.Objects;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -19,7 +17,6 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name="users")
 public class UserEntity {
-    
     @Column(name="id")
     @Id
     /*
@@ -30,9 +27,9 @@ public class UserEntity {
     @Column(name="username")
     private String username;
     private String email;
-    @Enumerated(EnumType.STRING)
 
     // auth server
+    //@Enumerated(EnumType.STRING)
     //@JdbcType(PostgreSQLEnumJdbcType.class)
     //private UserRole role;
     
@@ -45,10 +42,9 @@ public class UserEntity {
     public UserEntity() {
     }
 
-    public UserEntity(String email, Integer id, UserProfileEntity userProfile, String username, Boolean verifiedSeller) {
+    public UserEntity(String email, Integer id, String username, Boolean verifiedSeller) {
         this.email = email;
         this.id = id;
-        this.userProfile = userProfile;
         this.username = username;
         this.verifiedSeller = verifiedSeller;
     }
@@ -144,5 +140,13 @@ public class UserEntity {
         return sb.toString();
     }
 
+    public static UserEntity makeUserEntity(String email, Integer id, String username, Boolean verifiedSeller, UserProfileEntity userProfile)
+    {
+        UserEntity ret = new UserEntity(email, id, username, verifiedSeller);
+        
+        ret.userProfile = userProfile;
+        userProfile.setUserEntity(ret); //the userProfile owns the relationship
 
+        return ret;
+    }
 }

@@ -157,7 +157,7 @@ public class UserController {
         }
         catch (FeignException e)
         {
-            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(e);
         }
         catch (DatabaseConflictException e)
         {

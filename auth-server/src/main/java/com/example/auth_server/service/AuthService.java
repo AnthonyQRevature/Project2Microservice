@@ -23,6 +23,8 @@ import com.example.model.LoginRequest;
 import com.example.model.LoginResponse;
 import com.example.model.RegisterCredentialsRequest;
 
+import jakarta.transaction.Transactional;
+
 @Service
 @SuppressWarnings({"UnnecessaryReturnStatement"})
 public class AuthService {
@@ -49,6 +51,7 @@ public class AuthService {
         return loginResponse;
     }
 
+    @Transactional
     public void registerNewUser(RegisterCredentialsRequest user) 
         throws InvalidCredentialsException, DatabaseConflictException
     {
@@ -59,38 +62,16 @@ public class AuthService {
         }
 
         //check existence
-        if (!authDao.findByUsername(user.getUsername()).isEmpty())
+        if (
+            !authDao.findByUsername(user.getUsername()).isEmpty() || !authDao.findById(user.getId()).isEmpty())
         {
             //already in db
             throw new DatabaseConflictException();
-            //return ResponseEntity.status(409).build();
         }
         else
         {
-            /*
-            //TODO move this to the user dao
-            //conversion from model to entity
-            //dao.save will return an entity, guarenteed nonnull
-            //this entity will have it's ID field filled in unlike the one that is passed into the function
-            entity.setUsername(user.getUsername());
-            entity.setEmail(user.getEmail());
-            entity.setRole(UserRole.user); //default value
-
-            //assign the password field in the entity
-            String hash = hasher.hashPassword(user.getPassword());
-            entity.setPasswordHash(hash);
-            
-            //create a corresponding profile
-            UserProfileEntity profileEntity = new UserProfileEntity();
-            profileEntity.setUserEntity(entity);
-            profileEntity.setPfpEncoded(defaultPfp.get());
-            entity.setUserProfile(profileEntity);
-            
-            authDao.save(entity);
-            */
-
             String hashedPassword = hasher.hashPassword(user.getPassword());
-            AuthEntity newAuth = new AuthEntity(null, hashedPassword, UserRole.user, user.getUsername());
+            AuthEntity newAuth = new AuthEntity(user.getId(), hashedPassword, UserRole.user, user.getUsername());
 
             authDao.save(newAuth);
             
