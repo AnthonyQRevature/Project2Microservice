@@ -15,7 +15,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: user
+    container_name: user-service
     depends_on:
        - eureka
     links:

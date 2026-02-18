@@ -12,6 +12,12 @@ pipeline {
         SSH_CREDENTIAL_ID = 'app-server-ssh-key' // ID of the credential in Jenkins
 
         UTIL_TAG = 'util'
+
+        DIR_API_GATEWAY =   'api-gateway-demo'
+        DIR_AUTH_SERVER =   'auth-server'
+        DIR_EUREKA_SERVER = 'eureka-demo'
+        DIR_USER_SERVER =   'user-server'
+        DIR_UTIL =          'util'
     }
 
     tools {
@@ -23,7 +29,27 @@ pipeline {
     stages {
         stage('Build Backend') {
             steps {
-                
+                dir(DIR_UTIL)
+                {
+                    sh 'mvn clean install -DskipTests'
+                }
+
+                dir(DIR_API_GATEWAY)
+                {
+                    sh 'mvn clean package -DskipTests'
+                }
+                dir(DIR_AUTH_SERVER)
+                {
+                    sh 'mvn clean package -DskipTests'
+                }
+                dir(DIR_EUREKA_SERVER)
+                {
+                    sh 'mvn clean package -DskipTests'
+                }
+                dir(DIR_USER_SERVER)
+                {
+                    sh 'mvn clean package -DskipTests'
+                }
             }
         }
 
@@ -41,39 +67,21 @@ pipeline {
         stage('Deploy Backend (EC2)') {
             steps {
                 sshagent([SSH_CREDENTIAL_ID]) {
-                    // Prepare directory setup
-                    sh "ssh -o StrictHostKeyChecking=no ${APP_SERVER_USER}@${APP_SERVER_IP} 'mkdir -p target'"
 
-                    // Copy jar and Dockerfile
-                    sh "scp -o StrictHostKeyChecking=no backend/target/*.jar ${APP_SERVER_USER}@${APP_SERVER_IP}:/home/${APP_SERVER_USER}/target/app.jar"
-                    sh "scp -o StrictHostKeyChecking=no backend/Dockerfile ${APP_SERVER_USER}@${APP_SERVER_IP}:/home/${APP_SERVER_USER}/Dockerfile"
-                    
+                    // Compress
+                    sh "zip project.zip -@ < zip.lst"
+
+                    // Transfer
+                    sh "scp -o StrictHostKeyChecking=no project.zip ${APP_SERVER_USER}@${APP_SERVER_IP}:/home/${APP_SERVER_USER}/project.zip"
+
                     // Run Docker commands on remote server
                     sh """
                         ssh -o StrictHostKeyChecking=no ${APP_SERVER_USER}@${APP_SERVER_IP} '
-                            # Create network if not exists
-                            docker network create jenkins-net || true
+                            # Unzip
+                            unzip project.zip
 
-                            # Run Postgres
-                            docker stop postgres-db || true
-                            docker rm postgres-db || true
-                            docker run -d --name postgres-db \\
-                                --network jenkins-net \\
-                                -e POSTGRES_USER=postgres \\
-                                -e POSTGRES_PASSWORD=password \\
-                                -e POSTGRES_DB=mydb \\
-                                -v postgres-data:/var/lib/postgresql/data \\
-                                postgres:15
-
-                            # Build and Run Backend
-                            docker build -t spring-backend .
-                            docker stop spring-backend || true
-                            docker rm spring-backend || true
-                            docker run -d --name spring-backend \\
-                                --network jenkins-net \\
-                                -p 80:8080 \\
-                                -e DB_HOST=postgres-db \\
-                                spring-backend
+                            # Run Docker Compose
+                            docker-compose up
                         '
                     """
                 }
