@@ -92,6 +92,30 @@
 			"options": {
 				"cwd": "${workspaceFolder}/util"
 			}
+		},
+		{
+			"label": "ssh jenkins server",
+			"type": "shell",
+			"command": "Start-Process",
+			"args": [
+				"-FilePath",
+				"C:/WINDOWS/System32/cmd.exe",
+				"-ArgumentList",
+				"/K ssh ec2-user@ec2-3-138-173-15.us-east-2.compute.amazonaws.com"
+			],
+			"problemMatcher": []
+		},
+		{
+			"label": "ssh application server",
+			"type": "shell",
+			"command": "Start-Process",
+			"args": [
+				"-FilePath",
+				"C:/WINDOWS/System32/cmd.exe",
+				"-ArgumentList",
+				"/K ssh ec2-user@ec2-18-188-6-236.us-east-2.compute.amazonaws.com"
+			],
+			"problemMatcher": []
 		}
 	]
 }
