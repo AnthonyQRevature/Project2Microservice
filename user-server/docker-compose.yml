@@ -1,0 +1,29 @@
+services:
+  user_db:
+    build:
+      context: ./database
+      dockerfile: Dockerfile
+    environment:
+      POSTGRES_PASSWORD: secret
+    networks:
+       - user-network
+    ports:
+      # expose the database for testing
+       - "5433:5432"
+
+  user_server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: user-service
+    depends_on:
+       - eureka
+    links:
+       - "user_db:database"
+    networks:
+      - user-network
+      - eureka-network
+  
+networks:
+  user-network:
+    driver: bridge

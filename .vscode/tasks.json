@@ -2,27 +2,57 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"label": "Eureka Server",
+			"label": "Docker Run Eureka Server",
 			"type": "shell",
-			"command": "C:/Program Files/Git/bin/bash.exe",
+			"command": "docker-compose",
 			"args": [
-				"./mvnw", "spring-boot:run"
+				"up",
+				"--build"
 			],
 			"options": {
-				"cwd": "${workspaceFolder}/eureka-demo",
-				"env": {
-
-				}
+				"cwd": "${workspaceFolder}"
 			},
-			
 			"problemMatcher": []
 		},
 		{
-			"label": "Api Gateway",
-			"type": "shell",
-			"command": "C:/Program Files/Git/bin/bash.exe",
+			"label": "Build All",
+			"type": "process",
+			"command": "echo",
 			"args": [
-				"./mvnw", "spring-boot:run"
+				"Build complete"
+			],
+			"dependsOn": [
+				"Install Util",
+				"Build Eureka Server",
+				"Build Api Gateway",
+				"Build Auth Server",
+				"Build User Server"
+			],
+			"dependsOrder": "sequence",
+			"problemMatcher": []
+		},
+		{
+			"label": "Build Eureka Server",
+			"type": "process",
+			"command": "mvn",
+			"args": [
+				"clean",
+				"package",
+				"-DskipTests"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}/eureka-demo"
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "Build Api Gateway",
+			"type": "process",
+			"command": "mvn",
+			"args": [
+				"clean",
+				"package",
+				"-DskipTests"
 			],
 			"options": {
 				"cwd": "${workspaceFolder}/api-gateway-demo"
@@ -30,11 +60,13 @@
 			"problemMatcher": []
 		},
 		{
-			"label": "Auth Server",
-			"type": "shell",
-			"command": "C:/Program Files/Git/bin/bash.exe",
+			"label": "Build Auth Server",
+			"type": "process",
+			"command": "mvn",
 			"args": [
-				"./mvnw", "spring-boot:run"
+				"clean",
+				"package",
+				"-DskipTests"
 			],
 			"options": {
 				"cwd": "${workspaceFolder}/auth-server"
@@ -42,30 +74,18 @@
 			"problemMatcher": []
 		},
 		{
-			"label": "User Server",
-			"type": "shell",
-			"command": "C:/Program Files/Git/bin/bash.exe",
+			"label": "Build User Server",
+			"type": "process",
+			"command": "mvn",
 			"args": [
-				"./mvnw", "spring-boot:run"
+				"clean",
+				"package",
+				"-DskipTests"
 			],
 			"options": {
 				"cwd": "${workspaceFolder}/user-server"
 			},
 			"problemMatcher": []
-		},
-		{
-			"label": "Start Eureka2",
-			"type": "shell",
-			"command": "Start-Process",
-			"args": [
-				"-FilePath",
-				"C:/WINDOWS/System32/cmd.exe",
-				"-ArgumentList",
-				"/K \"./mvnw spring-boot:run\""
-			],
-			"options": {
-				"cwd": ""
-			}
 		},
 		{
 			"label": "Install Util",
@@ -78,6 +98,45 @@
 			"options": {
 				"cwd": "${workspaceFolder}/util"
 			}
+		},
+		{
+			"label": "Docker Build Util",
+			"type": "process",
+			"command": "docker",
+			"args": [
+				"build",
+				"-t",
+				"util",
+				"."
+			],
+			"problemMatcher": [],
+			"options": {
+				"cwd": "${workspaceFolder}/util"
+			}
+		},
+		{
+			"label": "ssh jenkins server",
+			"type": "shell",
+			"command": "Start-Process",
+			"args": [
+				"-FilePath",
+				"C:/WINDOWS/System32/cmd.exe",
+				"-ArgumentList",
+				"/K ssh ec2-user@ec2-3-138-173-15.us-east-2.compute.amazonaws.com"
+			],
+			"problemMatcher": []
+		},
+		{
+			"label": "ssh application server",
+			"type": "shell",
+			"command": "Start-Process",
+			"args": [
+				"-FilePath",
+				"C:/WINDOWS/System32/cmd.exe",
+				"-ArgumentList",
+				"/K ssh ec2-user@ec2-18-188-6-236.us-east-2.compute.amazonaws.com"
+			],
+			"problemMatcher": []
 		}
 	]
 }

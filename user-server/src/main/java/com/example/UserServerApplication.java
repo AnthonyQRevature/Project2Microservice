@@ -1,6 +1,5 @@
 package com.example;
 
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
@@ -12,14 +11,14 @@ import com.example.clients.AuthClient;
 @EnableDiscoveryClient
 @EnableFeignClients
 public class UserServerApplication {
-
-	public static void main(String[] args) {
-		SpringApplication.run(UserServerApplication.class, args);
-	}
-
 	@Bean
 	public SecurityHelper securityHelper(AuthClient client)
 	{
 		return new SecurityHelper(client);
+	}
+	@Bean
+	public DefaultPfp defaultPfp()
+	{
+		return new DefaultPfp();
 	}
 }

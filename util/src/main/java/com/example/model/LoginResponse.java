@@ -1,5 +1,7 @@
 package com.example.model;
 
+import java.util.Objects;
+
 import com.example.UserRole;
 
 public class LoginResponse {
@@ -45,5 +47,39 @@ public class LoginResponse {
 
     public void setRole(Integer role) {
         this.role = role;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 97 * hash + Objects.hashCode(this.id);
+        hash = 97 * hash + Objects.hashCode(this.role);
+        hash = 97 * hash + Objects.hashCode(this.username);
+        hash = 97 * hash + Objects.hashCode(this.encryptedToken);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final LoginResponse other = (LoginResponse) obj;
+        if (!Objects.equals(this.username, other.username)) {
+            return false;
+        }
+        if (!Objects.equals(this.encryptedToken, other.encryptedToken)) {
+            return false;
+        }
+        if (!Objects.equals(this.id, other.id)) {
+            return false;
+        }
+        return Objects.equals(this.role, other.role);
     }
 }

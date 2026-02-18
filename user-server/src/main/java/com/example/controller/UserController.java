@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,10 +21,14 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.AllowCors;
 import com.example.SecurityHelper;
 import com.example.UserRole;
+import com.example.exception.DatabaseConflictException;
 import com.example.exception.ServiceUnavailableException;
+import com.example.model.RegisterRequest;
 import com.example.model.UserResponse;
 import com.example.model.UserUpdateRequest;
 import com.example.service.UserService;
+
+import feign.FeignException;
 
 @RestController
 @AllowCors
@@ -38,8 +43,14 @@ public class UserController {
         try{
             UserResponse response = userService.findByUsername(username).orElseThrow();
             return ResponseEntity.ok(response);
-        } catch (NoSuchElementException e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e);
+        } 
+        catch (NoSuchElementException e) 
+        {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        catch (Exception e)
+        {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
         }
     }
 
@@ -48,8 +59,14 @@ public class UserController {
         try{
             UserResponse response = userService.findById(id).orElseThrow();
             return ResponseEntity.ok(response);
-        } catch (Exception e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e);
+        } 
+        catch (NoSuchElementException e)
+        {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        catch (Exception e)
+        {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
         }
     }
 
@@ -123,6 +140,33 @@ public class UserController {
 
     }
 
+    @PostMapping("")
+    public ResponseEntity<?> registerUser(@RequestBody RegisterRequest request)
+    {
+        try
+        {
+            boolean success = userService.registerNewUser(request);
+            if (success)
+            {
+                return ResponseEntity.ok().build();
+            }
+            else
+            {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            }
+        }
+        catch (FeignException e)
+        {
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(e);
+        }
+        catch (DatabaseConflictException e)
+        {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+    }
+
+    /*
+    //handled by auth service
     @PatchMapping("/{id}/perms")
     public ResponseEntity<?> setPerms(
         @RequestHeader("Authorization") String auth,
@@ -150,7 +194,7 @@ public class UserController {
         {
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(e);
         }
-    }
+    }*/
 
     @Autowired
     public UserController(UserService userService, SecurityHelper security)

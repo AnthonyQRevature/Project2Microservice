@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
+//would be nice if there was a way to generate this implicitly
 public class Marshaller<Model, Entity> {
 
     Function<Entity, Model> toModel;

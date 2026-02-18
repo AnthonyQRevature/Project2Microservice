@@ -1,20 +1,28 @@
 package com.example.service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import javax.security.auth.login.AccountNotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import com.example.UserRole;
-import com.example.entity.UserEntity;
+import com.example.DefaultPfp;
+import com.example.Marshaller;
+import com.example.clients.AuthClient;
+import com.example.exception.DatabaseConflictException;
+import com.example.model.RegisterCredentialsRequest;
+import com.example.model.RegisterRequest;
 import com.example.model.UserResponse;
 import com.example.model.UserUpdateRequest;
 import com.example.repository.UserDao;
+import com.example.repository.UserEntity;
+import com.example.repository.UserProfileDao;
+import com.example.repository.UserProfileEntity;
 
+import feign.FeignException;
 import jakarta.transaction.Transactional;
 
 /*
@@ -23,26 +31,30 @@ import jakarta.transaction.Transactional;
 @Service
 public class UserService {
 
-    static List<UserResponse> toModel(List<UserEntity> entity)
-    {
-        return entity.stream().map(e -> toModel(e)).toList();
-    }
-    static Optional<UserResponse> toModel(Optional<UserEntity> entity)
-    {
-        if (entity.isPresent())
-        {
-            return Optional.of(toModel(entity.get()));
-        }
-        else
-        {
-            return Optional.empty();
-        }
-    }
-    static UserResponse toModel(UserEntity entity)
-    {
-        return new UserResponse(entity);
-    }
-
+    Marshaller<UserResponse.ProfileResponse, UserProfileEntity> profileMarshaller = new Marshaller<>((e) -> {
+        return new UserResponse.ProfileResponse(
+            e.getBio(),
+            e.getLatitude(),
+            e.getLongitude(),
+            e.getPfpEncoded()
+        );
+    });
+    Marshaller<UserResponse, UserEntity> marshaller = new Marshaller<>((e) -> {
+        return new UserResponse(
+            e.getEmail(),
+            e.getId(),
+            profileMarshaller.convert(e.getUserProfile()),
+            e.getUsername(),
+            e.getVerifiedSeller()
+        );
+    });
+    
+    @Autowired
+    AuthClient auth;
+    @Autowired
+    DefaultPfp defaultPfp;
+    @Autowired
+    UserProfileDao profileDao;
     UserDao dao;
 
     @Transactional
@@ -58,11 +70,11 @@ public class UserService {
             if (body.getProfile().getLongitude() != null) entity.getUserProfile().setLongitude(body.getProfile().getLongitude());
         }
 
-        return toModel(entity);
+        return marshaller.convert(entity);
     }
     
     public Optional<UserResponse> findByUsername(String username){
-        return toModel(dao.findUserByUsername(username));
+        return marshaller.convert(dao.findUserByUsername(username));
     }
 
     public boolean deleteUserById(int id){
@@ -73,27 +85,51 @@ public class UserService {
     }
 
     public List<UserResponse> getAllUsers() {
-        return toModel(dao.findAll());
+        return marshaller.convert(dao.findAll());
     }
 
     public Optional<UserResponse> findById(Integer id) {
-        return toModel(dao.findById(id));
+        return marshaller.convert(dao.findById(id));
     }
 
     @Transactional
-    public boolean setRole(Integer userId, UserRole role)
+    public boolean registerNewUser(RegisterRequest request) 
+        throws DatabaseConflictException, FeignException
     {
-        try
+        //check for conflict
+        if (dao.existsByUsername(request.getUsername()))
         {
-            UserEntity entity = dao.findById(userId).orElseThrow();
-            entity.setRole(role);
-            return true;
-        }
-        catch (NoSuchElementException e)
-        {
-            return false;
+            throw new DatabaseConflictException();
         }
 
+        //should replace with a factory pattern
+        UserEntity unmanaged = UserEntity.makeUserEntity(
+            request.getEmail(), 
+            null, 
+            request.getUsername(), 
+            false, 
+            new UserProfileEntity(
+                null,
+                null,
+                null,
+                null,
+                null,
+                defaultPfp.get()
+            )
+        );
+        var managed = dao.save(unmanaged);
+
+        RegisterCredentialsRequest newCredentials = new RegisterCredentialsRequest();
+        newCredentials.setId(managed.getId());
+        newCredentials.setUsername(request.getUsername());
+        newCredentials.setPassword(request.getPassword());
+
+        if (auth.registerUser(newCredentials).getStatusCode() != HttpStatus.OK)
+        {
+            throw new DatabaseConflictException();
+        }
+
+        return true;
     }
 
     //achieves constructor injection
