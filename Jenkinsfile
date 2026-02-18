@@ -70,7 +70,7 @@ pipeline {
 
                     // Compress
                     sh "chmod +x ./zip_files.sh"
-                    sh "./zip_files.sh"
+                    sh "bash ./zip_files.sh"
 
                     // Transfer
                     sh "scp -o StrictHostKeyChecking=no project.zip ${APP_SERVER_USER}@${APP_SERVER_IP}:/home/${APP_SERVER_USER}/project.zip"
