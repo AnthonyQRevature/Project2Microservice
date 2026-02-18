@@ -93,6 +93,37 @@ public class ReportService {
 			return false;
 		}
 	}
+
+	public Boolean purgeAssociations(Integer id)
+	{
+		try
+		{
+			Optional<ReportEntity> looker = dao.findById(id);
+			ReportEntity holder;
+			if(looker.isEmpty())
+			{
+				//TODO: throw special error, for not in database
+				return false;
+			}
+			holder = looker.get();
+
+			if (holder.getPost_id()!= null)
+			{
+				dao.nullifyPost(id);
+			}
+
+			if(holder.getMessage_id()!= null)
+			{
+				dao.nullifyMessage(id);
+			}
+
+			return true;
+		}
+		catch (Exception e)
+		{
+			return false;
+		}
+	}
 }
 /*
 GET /reports                 gets a list of all reports created by users

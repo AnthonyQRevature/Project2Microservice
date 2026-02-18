@@ -134,12 +134,15 @@ public class ReportController {
 			//if successful, remove association
 		if(reportEntity.getMessage_id() != null)
 		{
-			//delete message
+			//TODO: api call, delete message
+
 		}
-		else if (reportEntity.getPost_id() != null)
+		if (reportEntity.getPost_id() != null)
 		{
-			//delete post
+			//TODO: api calls
 		}
+
+		service.purgeAssociations(id);
 
 		//if we reach this return statement, then the report has no associated post/message. return 400 error
 		//TODO: figure out which 400 error is best in this situation

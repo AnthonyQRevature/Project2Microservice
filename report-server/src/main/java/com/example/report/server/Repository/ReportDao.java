@@ -16,6 +16,10 @@ public interface ReportDao extends JpaRepository<ReportEntity, Integer> {
 	@Query("UPDATE ReportEntity r set r.status = ?2 WHERE r.id = ?1")
 	public void ChangeStatus(Integer id, ReportStatus newStatus);
 
+	//get reports by id
+	//@Query("SELECT r FROM ReportEntity r WHERE r.reported_id = ?1")
+	//public List<ReportEntity> getReportsOf(Integer id);
+
 	//get reports of user
 	@Query("SELECT r FROM ReportEntity r WHERE r.reported_id = ?1")
 	public List<ReportEntity> getReportsOf(Integer id);
@@ -23,4 +27,14 @@ public interface ReportDao extends JpaRepository<ReportEntity, Integer> {
 	//get reports from user
 	@Query("SELECT r FROM ReportEntity r WHERE r.reporter_id = ?1")
 	public List<ReportEntity> getReportsFrom(Integer id);
+
+	@Transactional
+	@Modifying
+	@Query("UPDATE ReportEntity r set r.post_id = NULL WHERE r.id = ?1")
+	public void nullifyPost(Integer id);
+
+	@Transactional
+	@Modifying
+	@Query("UPDATE ReportEntity r set r.message_id = NULL WHERE r.id = ?1")
+	public void nullifyMessage(Integer id);
 }
