@@ -11,3 +11,6 @@ eureka:
     fetch-registry: false
   server:
     enable-self-preservation: false # Disable for dev
+  instance:
+    hostname:
+      18.221.112.139
