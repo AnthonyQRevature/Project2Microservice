@@ -107,6 +107,7 @@ pipeline {
                 sshagent([SSH_CREDENTIAL_ID]) {
 
                     // Compress
+                    sh "rm ./project.zip"
                     sh "sudo ./zip_files.sh project.zip ./${DIR_AUTH_SERVER}/zip.lst"
 
                     // Transfer

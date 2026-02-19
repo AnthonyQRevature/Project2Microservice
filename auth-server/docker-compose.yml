@@ -19,9 +19,9 @@ services:
     links:
        - "auth_db:database"
     networks:
-      - auth-network
+       - auth-network
     ports:
-      8080:8080
+       - 8080:8080
   
 networks:
   auth-network:
