@@ -78,6 +78,7 @@ pipeline {
                 sshagent([SSH_CREDENTIAL_ID]) {
 
                     // Compress
+                    sh "rm ./project.zip"
                     sh "sudo ./zip_files.sh project.zip ./${DIR_EUREKA_SERVER}/zip.lst"
 
                     // Transfer
@@ -121,7 +122,7 @@ pipeline {
 
                             # Build / Run Docker
                             cd ./${DIR_AUTH_SERVER}
-                            docker compose up --build
+                            docker compose up --build --detach
                         '
                     """
                 }
