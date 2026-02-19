@@ -87,7 +87,7 @@ pipeline {
                     sh """
                         ssh -o StrictHostKeyChecking=no ${USER}@${EUREKA_SERVER_IP} '
                             # Unzip
-                            unzip project.zip
+                            unzip -o project.zip
 
                             # Build / Run Docker
                             cd ./${DIR_EUREKA_SERVER}
@@ -117,7 +117,7 @@ pipeline {
                     sh """
                         ssh -o StrictHostKeyChecking=no ${USER}@${AUTH_SERVER_IP} '
                             # Unzip
-                            unzip project.zip
+                            unzip -o project.zip
 
                             # Build / Run Docker
                             cd ./${DIR_AUTH_SERVER}
