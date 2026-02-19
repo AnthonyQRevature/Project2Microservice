@@ -102,6 +102,30 @@ pipeline {
                 }
             }
         }
+        stage('Deploy Backend Auth') {
+            steps {
+                sshagent([SSH_CREDENTIAL_ID]) {
+
+                    // Compress
+                    sh "sudo ./zip_files.sh project.zip ./${DIR_AUTH_SERVER}/zip.lst"
+
+                    // Transfer
+                    sh "scp -o StrictHostKeyChecking=no project.zip ${USER}@${AUTH_SERVER_IP}:/home/${USER}/project.zip"
+
+                    // Run Docker commands on remote server
+                    sh """
+                        ssh -o StrictHostKeyChecking=no ${USER}@${AUTH_SERVER_IP} '
+                            # Unzip
+                            unzip project.zip
+
+                            # Build / Run Docker
+                            cd ./${DIR_AUTH_SERVER}
+                            docker compose up --build
+                        '
+                    """
+                }
+            }
+        }
         /*
         stage('Deploy Frontend (S3)') {
             steps {

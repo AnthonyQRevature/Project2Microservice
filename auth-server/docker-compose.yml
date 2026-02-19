@@ -16,13 +16,12 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: auth-service
-    depends_on:
-       - eureka
     links:
        - "auth_db:database"
     networks:
       - auth-network
-      - eureka-network
+    ports:
+      8080:8080
   
 networks:
   auth-network:
