@@ -78,7 +78,7 @@ pipeline {
                 sshagent([SSH_CREDENTIAL_ID]) {
 
                     // Compress
-                    sh "bash ./zip_files.sh project.zip ./${DIR_EUREKA_SERVER}/zip.lst"
+                    sh "./zip_files.sh project.zip ./${DIR_EUREKA_SERVER}/zip.lst"
 
                     // Transfer
                     sh "scp -o StrictHostKeyChecking=no project.zip ${USER}@${EUREKA_SERVER_IP}:/home/${USER}/project.zip"
