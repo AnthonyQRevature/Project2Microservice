@@ -1,4 +1,4 @@
-#!bin/sh
+#!/bin/sh
 
 cat "$2" | while read line 
 do
