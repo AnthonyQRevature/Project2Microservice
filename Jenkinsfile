@@ -127,8 +127,8 @@ pipeline {
                             docker stop gateway || true
                             docker rm gateway || true
                             # docker run -d --name gateway \\
-                                -p 80:8080 \\
-                                gateway
+                            #    -p 80:8080 \\
+                            #    gateway
                         '
                     """
                 }
