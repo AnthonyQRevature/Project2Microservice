@@ -127,7 +127,7 @@ pipeline {
                             docker stop gateway || true
                             docker rm gateway || true
                             # docker run -d --name gateway \\
-                            #    -p 80:8080 \\
+                            #    -p 80:80 \\
                             #    gateway
                         '
                     """
@@ -153,8 +153,8 @@ pipeline {
                             unzip -o project.zip
 
                             # Build / Run Docker
-                            cd ./${DIR_AUTH_SERVER}
-                            docker compose up --build --detach
+                            # cd ./${DIR_AUTH_SERVER}
+                            # docker compose up --build --detach
                         '
                     """
                 }
