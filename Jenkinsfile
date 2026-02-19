@@ -11,6 +11,12 @@ pipeline {
         APP_SERVER_USER = 'ec2-user'
         SSH_CREDENTIAL_ID = 'app-server-ssh-key' // ID of the credential in Jenkins
 
+        USER = 'ec2-user'
+        API_GATEWAY_IP = '172.31.19.231'
+        EUREKA_SERVER_IP = '172.31.31.10'
+        AUTH_SERVER_IP = '172.31.20.216'
+        USER_SERVER_IP = '172.31.18.195'
+
         UTIL_TAG = 'util'
 
         DIR_API_GATEWAY =   'api-gateway-demo'
@@ -29,6 +35,9 @@ pipeline {
     stages {
         stage('Build Backend') {
             steps {
+                // the zip helper script
+                sh "chmod +x ./zip_files.sh"
+
                 dir(DIR_UTIL)
                 {
                     sh 'mvn clean install -DskipTests'
@@ -64,25 +73,30 @@ pipeline {
             }
         }*/
 
-        stage('Deploy Backend (EC2)') {
+        stage('Deploy Backend Eureka') {
             steps {
                 sshagent([SSH_CREDENTIAL_ID]) {
 
                     // Compress
-                    sh "chmod +x ./zip_files.sh"
-                    sh "sudo bash ./zip_files.sh"
+                    sh "sudo bash ./zip_files.sh project.zip ./${DIR_EUREKA_SERVER}/zip.lst"
 
                     // Transfer
-                    sh "scp -o StrictHostKeyChecking=no project.zip ${APP_SERVER_USER}@${APP_SERVER_IP}:/home/${APP_SERVER_USER}/project.zip"
+                    sh "scp -o StrictHostKeyChecking=no project.zip ${USER}@${EUREKA_SERVER_IP}:/home/${USER}/project.zip"
 
                     // Run Docker commands on remote server
                     sh """
-                        ssh -o StrictHostKeyChecking=no ${APP_SERVER_USER}@${APP_SERVER_IP} '
+                        ssh -o StrictHostKeyChecking=no ${USER}@${EUREKA_SERVER_IP} '
                             # Unzip
                             unzip project.zip
 
-                            # Run Docker Compose
-                            docker-compose up
+                            # Build / Run Docker
+                            cd ./${DIR_EUREKA_SERVER}
+                            docker build -t eureka .
+                            docker stop eureka || true
+                            docker rm eureka || true
+                            docker run -d --name eureka \\
+                                -p 80:8080 \\
+                                eureka
                         '
                     """
                 }

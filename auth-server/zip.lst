@@ -1,0 +1,4 @@
+auth-server/target/*.jar
+auth-server/database/*
+auth-server/docker-compose.yml
+auth-server/Dockerfile

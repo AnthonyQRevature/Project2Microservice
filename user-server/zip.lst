@@ -1,0 +1,4 @@
+user-server/target/*.jar
+user-server/database/*
+user-server/docker-compose.yml
+user-server/Dockerfile
