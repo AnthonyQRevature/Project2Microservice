@@ -7,9 +7,6 @@ services:
       POSTGRES_PASSWORD: secret
     networks:
        - auth-network
-    ports:
-      # expose the database for testing
-       - "5432:5432"
 
   auth_server:
     build:

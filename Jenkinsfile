@@ -96,13 +96,45 @@ pipeline {
                             docker stop eureka || true
                             docker rm eureka || true
                             docker run -d --name eureka \\
-                                -p 80:8080 \\
+                                -p 8761:8761 \\
                                 eureka
                         '
                     """
                 }
             }
         }
+
+        stage('Deploy Backend Api Gateway') {
+            steps {
+                sshagent([SSH_CREDENTIAL_ID]) {
+
+                    // Compress
+                    sh "rm ./project.zip"
+                    sh "sudo ./zip_files.sh project.zip ./${DIR_API_GATEWAY}/zip.lst"
+
+                    // Transfer
+                    sh "scp -o StrictHostKeyChecking=no project.zip ${USER}@${API_GATEWAY_IP}:/home/${USER}/project.zip"
+
+                    // Run Docker commands on remote server
+                    sh """
+                        ssh -o StrictHostKeyChecking=no ${USER}@${API_GATEWAY_IP} '
+                            # Unzip
+                            unzip -o project.zip
+
+                            # Build / Run Docker
+                            cd ./${DIR_API_GATEWAY}
+                            docker build -t gateway .
+                            docker stop gateway || true
+                            docker rm gateway || true
+                            # docker run -d --name gateway \\
+                                -p 80:8080 \\
+                                gateway
+                        '
+                    """
+                }
+            }
+        }
+
         stage('Deploy Backend Auth') {
             steps {
                 sshagent([SSH_CREDENTIAL_ID]) {
